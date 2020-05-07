@@ -1,0 +1,27 @@
+{
+	"name": "cksh-post",
+	"version": "1.0.0",
+	"description": "a bot alerting when new post ",
+	"main": "app.js",
+	"scripts": {
+		"start": "node app.js",
+		"dev": "nodemon start",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/simba-fs/cksh-post.git"
+	},
+	"author": "simba-fs",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/simba-fs/cksh-post/issues"
+	},
+	"homepage": "https://github.com/simba-fs/cksh-post#readme",
+	"dependencies": {
+		"axios": "^0.19.2"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.3"
+	}
+}
