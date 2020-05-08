@@ -2,6 +2,6 @@
 a bot alerting when new post 
 
 ```
-npm run prepare
+npm i 
 npm start
 ```
