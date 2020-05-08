@@ -15,7 +15,6 @@ else db = {
 const url = 'https://www2.cksh.tp.edu.tw/category/news/news_1/?officeID=53';
 
 function saveDB(db){
-	console.log(Object.keys(db));
 	fs.createWriteStream(dbPath).write(JSON.stringify(db));
 }
 
@@ -63,6 +62,7 @@ const getPost = () => axios.get(url)
 			for(let i in newPost){
 				db.posts.unshift(newPost[i])
 			}
+			db.fingerprint = fingerprint;
 			
 		}else{
 			db.fingerprint = fingerprint;
