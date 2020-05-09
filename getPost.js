@@ -1,28 +1,19 @@
 require('dotenv').config();
 
-const dbPath = process.env.db || './db.json';
-
 const axios = require('axios').default;
 const cheerio = require('cheerio');
 const md5 = require('md5');
-const fs = require('fs');
-let db;
-if(fs.existsSync('./db.json') && fs.statSync('./db.json').size > 0) db = require('./db.json');
-else db = {
-	fingerprint: '',
-	posts: [],
-	channel: []
-};
-const url = 'https://www2.cksh.tp.edu.tw/category/news/news_1/?officeID=53';
 
-/**
- *	@constrctor
- *	@function
- *	@description saveDB save db to file
- */
-function saveDB(db){
-	fs.createWriteStream(dbPath).write(JSON.stringify(db));
+const dbPath = process.env.db || './db.json';
+const JSONdb = require('simple-json-db');
+const db = new JSONdb('./db.json', {syncOnWrite: false});
+if(Object.keys(db.JSON()).length === 0){
+	db.set('fingerprint', '');
+	db.set('posts', []);
+	db.set('channel', []);
 }
+
+const url = 'https://www2.cksh.tp.edu.tw/category/news/news_1/?officeID=53';
 
 class Post{
 	/**
@@ -45,7 +36,7 @@ class Post{
  *	@constructor
  *	@function getPost
  *	@description get post from cksh
- *	@return {Promise} pass a object {status, $} if status is 'new post' pass {status, post, $}
+ *	@return {Promise} pass a object {status} if status is 'new post' pass {status, post}
  */
 const getPost = () => axios.get(url)
 	.then(res => cheerio.load(res.data))
@@ -58,7 +49,6 @@ const getPost = () => axios.get(url)
 			// console.log('no new post');	
 			return new Promise(res => res({
 				status: 'no new post',
-				$: $
 			}));
 		}
 
@@ -67,11 +57,13 @@ const getPost = () => axios.get(url)
 		// console.log('new post, fingerprint:', fingerprint);
 
 		// get post title, content and url
+		let posts = db.get('posts');
 		let post = [];
 		let newPost = [];
 		$allPost.children().each((i, item) => post.push(new Post($(item))));
-		if(db.posts.length > 0){
-			let lastPost = db.posts[0];
+		if(posts.length >= 0){
+		console.log(65, db.JSON());
+			let lastPost = posts[0];
 			let updateNum = 0;
 			for(let i in db.posts){
 				if(post[i].md5 !== lastPost.md5){
@@ -81,16 +73,19 @@ const getPost = () => axios.get(url)
 			// console.log('newPost', newPost);
 			newPost.reverse();
 			for(let i in newPost){
-				db.posts.unshift(newPost[i])
+				posts.unshift(newPost[i])
 			}
-			db.fingerprint = fingerprint;
+			db.set('posts', posts);
+			db.set('fingerprint', fingerprint);
 			
 		}else{
 			db.fingerprint = fingerprint;
 			db.posts = post;
 		}
 
-		saveDB(db);	
+		console.log(db.JSON());
+		db.sync();
+
 		return new Promise(res => res({
 			status: 'new post',
 			post: newPost,
@@ -99,4 +94,5 @@ const getPost = () => axios.get(url)
 	})
 	.catch(console.error);
 
+getPost().then(console.log);
 module.exports = getPost;

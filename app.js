@@ -4,18 +4,19 @@ const getPost = require('./getPost.js');
 const simply = require('simply.js');
 const cron = require('node-cron');
 
-const dbPath = process.env.db || './db.json';
-const fs = require('fs');
-let db;
-if(fs.existsSync(dbPath) && fs.statSync(dbPath).size > 0) db = require(dbPath);
-else db = {
-	fingerprint: '',
-	posts: [],
-	channel: []
-};
-
 let boardcastPool = [];
 let boardcastPoolID = [];
+
+const dbPath = process.env.db || './db.json';
+const JSONdb = require('simple-json-db');
+const db = new JSONdb('./db.json');
+if(Object.keys(db.JSON()).length === 0){
+	db.set('fingerprint', '');
+	db.set('posts', []);
+	db.set('channel', []);
+}else{
+	boardcastPoolID = db.get('channel');
+}
 
 simply.login(process.env.DC_BOT_TOKEN);
 
@@ -32,14 +33,6 @@ function restoreChannel(boardcastPool, boardcastPoolID){
 	}
 }
 
-function saveChannelId(boardcastPoolID){
-	console.log(db);
-	db.channel = boardcastPoolID.slice();
-	a = JSON.stringify(db);
-	console.log(db);
-	fs.writeFile(process.env.db, a, err => {if(err) console.error(err)});
-}
-
 simply.on('ready', () => {
 	restoreChannel(boardcastPool, boardcastPoolID);
 });
@@ -53,10 +46,10 @@ simply.cmd('cp', (msg, arg) => {
 			break;
 		case 'add': 
 			if(!boardcastPoolID.includes(msg.channel.id)){
+				msg.channel.send(`Add channel ${msg.channel.id}`);
 				boardcastPool.push(msg.channel);
 				boardcastPoolID.push(msg.channel.id);
-				saveChannelId(boardcastPoolID);
-				msg.channel.send(`Add channel ${msg.channel.id}`);
+				db.set('channel', boardcastPoolID)
 			}else{
 				msg.channel.send('This channel has added');
 			}
@@ -66,3 +59,11 @@ simply.cmd('cp', (msg, arg) => {
 			msg.reply('this is help page');
 	}
 })
+
+/** boardcast on a specific time */
+function boardcast(boardcastPool){
+	getPost()
+		.then(console.log);
+}
+
+boardcast();
