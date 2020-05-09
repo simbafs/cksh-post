@@ -6,7 +6,7 @@ const md5 = require('md5');
 
 const dbPath = process.env.db || './db.json';
 const JSONdb = require('simple-json-db');
-const db = new JSONdb('./db.json', {syncOnWrite: false});
+const db = new JSONdb('./db.json'/*, {syncOnWrite: false}*/);
 if(Object.keys(db.JSON()).length === 0){
 	db.set('fingerprint', '');
 	db.set('posts', []);
@@ -45,7 +45,7 @@ const getPost = () => axios.get(url)
 		let fingerprint = md5($allPost.children().children().text());
 
 		// if not update
-		if(db.fingerprint === fingerprint){
+		if(db.get('fingerprint') === fingerprint){
 			// console.log('no new post');	
 			return new Promise(res => res({
 				status: 'no new post',
@@ -61,8 +61,7 @@ const getPost = () => axios.get(url)
 		let post = [];
 		let newPost = [];
 		$allPost.children().each((i, item) => post.push(new Post($(item))));
-		if(posts.length >= 0){
-		console.log(65, db.JSON());
+		if(posts.length > 0){
 			let lastPost = posts[0];
 			let updateNum = 0;
 			for(let i in db.posts){
@@ -77,6 +76,7 @@ const getPost = () => axios.get(url)
 			}
 			db.set('posts', posts);
 			db.set('fingerprint', fingerprint);
+			console.log('after change', db.JSON());
 			
 		}else{
 			db.fingerprint = fingerprint;
@@ -84,15 +84,12 @@ const getPost = () => axios.get(url)
 		}
 
 		console.log(db.JSON());
-		db.sync();
-
 		return new Promise(res => res({
 			status: 'new post',
-			post: newPost,
-			$: $
+			post: newPost
 		}));
 	})
 	.catch(console.error);
 
-getPost().then(console.log);
+setTimeout( () => getPost().then(console.log), 100);
 module.exports = getPost;
