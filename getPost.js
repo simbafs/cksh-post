@@ -11,6 +11,7 @@ if(fs.existsSync('./db.json') && fs.statSync('./db.json').size > 0) db = require
 else db = {
 	fingerprint: '',
 	posts: [],
+	channel: []
 };
 const url = 'https://www2.cksh.tp.edu.tw/category/news/news_1/?officeID=53';
 
