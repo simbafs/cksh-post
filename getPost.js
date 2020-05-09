@@ -64,7 +64,7 @@ const getPost = () => axios.get(url)
 		if(posts.length > 0){
 			let lastPost = posts[0];
 			let updateNum = 0;
-			for(let i in db.posts){
+			for(let i in posts){
 				if(post[i].md5 !== lastPost.md5){
 					newPost.push(post[i]);
 				}else break;
@@ -74,16 +74,11 @@ const getPost = () => axios.get(url)
 			for(let i in newPost){
 				posts.unshift(newPost[i])
 			}
-			db.set('posts', posts);
-			db.set('fingerprint', fingerprint);
-			console.log('after change', db.JSON());
-			
-		}else{
-			db.fingerprint = fingerprint;
-			db.posts = post;
 		}
 
-		console.log(db.JSON());
+		db.set('fingerprint', fingerprint);
+		db.set('posts', post);
+
 		return new Promise(res => res({
 			status: 'new post',
 			post: newPost
@@ -91,5 +86,4 @@ const getPost = () => axios.get(url)
 	})
 	.catch(console.error);
 
-setTimeout( () => getPost().then(console.log), 100);
 module.exports = getPost;
