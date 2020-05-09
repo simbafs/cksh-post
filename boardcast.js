@@ -90,7 +90,7 @@ function boardcast(){
 				boardcastPool.forEach(channel => channel.send(msg));
 				
 			 }
-		});
+		}).catch(console.error);
 }
 
 module.exports = boardcast;
