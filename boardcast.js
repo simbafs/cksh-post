@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const helpMsg = require('./helpMsg.js');
 const getPost = require('./getPost.js');
 const simply = require('simply.js');
 const { MessageEmbed } = require('discord.js');
@@ -50,14 +51,26 @@ simply.cmd('cp', (msg, arg) => {
 				msg.channel.send(`Add channel ${msg.channel.id}`);
 				boardcastPool.push(msg.channel);
 				boardcastPoolID.push(msg.channel.id);
-				db.set('channel', boardcastPoolID)
+				setTimeout(() => db.set('channel', boardcastPoolID), 100);
 			}else{
 				msg.channel.send('This channel has added');
 			}
 			break;
+		case 'remove':
+			if(boardcastPoolID.includes(msg.channel.id)){
+				msg.channel.send(`Remove channel ${msg.channel.id}`);
+				boardcastPool = boardcastPool.filter(i => i.id !== msg.channel.id);
+				boardcastPoolID = boardcastPoolID.filter(i => i !== msg.channel.id);
+				console.log(boardcastPool);
+				console.log(boardcastPoolID);
+				setTimeout(() => db.set('channel', boardcastPoolID), 100);
+			}else{
+				msg.channel.send('This channel isn\'t in the list');
+			}
+			break;
 		case 'help':
 		default:
-			msg.reply('this is help page');
+			msg.channel.send(helpMsg);
 	}
 })
 
