@@ -1,5 +1,5 @@
 let helpMsg = '```\n'
-			+ 'Usage: !cp <commadn> [value]\n'
+			+ 'Usage: !cp <command> [value]\n'
 			+ '\n'
 			+ 'Commands:\n'
 			+ '\tping ..... test if the server is running\n'
