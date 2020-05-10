@@ -10,7 +10,7 @@ DC_BOT_TOKEN='your token'
 db='./db.json'
 ```
 
-apply at [https://discord.com/developers/applications](https://discord.com/developers/applications)
+apply bot token at [https://discord.com/developers/applications](https://discord.com/developers/applications)
 
 # start the bot
 ```
