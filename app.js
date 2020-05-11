@@ -1,5 +1,5 @@
-const boardcast = require('./boardcast.js');
+const broadcast = require('./broadcast.js');
 const cron = require('node-cron');
 
-cron.schedule('0 0 12 * * *', boardcast);
-cron.schedule('0 0 16 * * *', boardcast);
+cron.schedule('0 0 12,16 * * *', broadcast, {timezone: "Asia/Taipei"});
+// broadcast().then(console.log, console.error);

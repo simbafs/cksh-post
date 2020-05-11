@@ -6,8 +6,8 @@ const simply = require('simply.js');
 const { MessageEmbed } = require('discord.js');
 const cron = require('node-cron');
 
-let boardcastPool = [];
-let boardcastPoolID = [];
+let broadcastPool = [];
+let broadcastPoolID = [];
 
 const dbPath = process.env.db || './db.json';
 const JSONdb = require('simple-json-db');
@@ -17,7 +17,7 @@ if(Object.keys(db.JSON()).length === 0){
 	db.set('posts', []);
 	db.set('channel', []);
 }else{
-	boardcastPoolID = db.get('channel');
+	broadcastPoolID = db.get('channel');
 }
 
 simply.login(process.env.DC_BOT_TOKEN);
@@ -25,45 +25,44 @@ simply.login(process.env.DC_BOT_TOKEN);
 /**
  *	get channel object when the bot restart
  *	@function
- *	@param {Array} boardcastPool - the pool contains channel object
- *	@param {Array} boardcastPoolID - the pool contains channel id
+ *	@param {Array} broadcastPool - the pool contains channel object
+ *	@param {Array} broadcastPoolID - the pool contains channel id
  */
-function restoreChannel(boardcastPool, boardcastPoolID){
-	boardcastPool.length = 0;
-	for(let id of boardcastPoolID){
-		boardcastPool.push(simply.client.channels.get(id));
+function restoreChannel(broadcastPool, broadcastPoolID){
+	broadcastPool.length = 0;
+	for(let id of broadcastPoolID){
+		broadcastPool.push(simply.client.channels.get(id));
 	}
 }
 
 simply.on('ready', () => {
-	restoreChannel(boardcastPool, boardcastPoolID);
+	restoreChannel(broadcastPool, broadcastPoolID);
 });
 
 simply.set('prefix', '!');
-simply.echo('cp ping', 'pong');
 simply.cmd('cp', (msg, arg) => {
 	switch(arg[1]){
 		case 'ping':
 			msg.channel.send('pong!');
 			break;
 		case 'add': 
-			if(!boardcastPoolID.includes(msg.channel.id)){
+			if(!broadcastPoolID.includes(msg.channel.id)){
 				msg.channel.send(`Add channel ${msg.channel.id}`);
-				boardcastPool.push(msg.channel);
-				boardcastPoolID.push(msg.channel.id);
-				setTimeout(() => db.set('channel', boardcastPoolID), 100);
+				broadcastPool.push(msg.channel);
+				broadcastPoolID.push(msg.channel.id);
+				setTimeout(() => db.set('channel', broadcastPoolID), 100);
 			}else{
 				msg.channel.send('This channel has added');
 			}
 			break;
 		case 'remove':
-			if(boardcastPoolID.includes(msg.channel.id)){
+			if(broadcastPoolID.includes(msg.channel.id)){
 				msg.channel.send(`Remove channel ${msg.channel.id}`);
-				boardcastPool = boardcastPool.filter(i => i.id !== msg.channel.id);
-				boardcastPoolID = boardcastPoolID.filter(i => i !== msg.channel.id);
-				console.log(boardcastPool);
-				console.log(boardcastPoolID);
-				setTimeout(() => db.set('channel', boardcastPoolID), 100);
+				broadcastPool = broadcastPool.filter(i => i.id !== msg.channel.id);
+				broadcastPoolID = broadcastPoolID.filter(i => i !== msg.channel.id);
+				console.log(broadcastPool);
+				console.log(broadcastPoolID);
+				setTimeout(() => db.set('channel', broadcastPoolID), 100);
 			}else{
 				msg.channel.send('This channel isn\'t in the list');
 			}
@@ -74,14 +73,14 @@ simply.cmd('cp', (msg, arg) => {
 	}
 })
 
-/** boardcast on a specific time */
-function boardcast(){
-	getPost()
+/** broadcast on a specific time */
+function broadcast(){
+	return getPost()
 		.then(e => {
 			console.group('getPost')
 			console.log(e);
-			console.log('channel', boardcastPool.length);
-			console.log(boardcastPoolID);
+			console.log('channel', broadcastPool.length);
+			console.log(broadcastPoolID);
 			console.groupEnd();
 			 if(e.status === 'new post'){
 				/*
@@ -94,16 +93,16 @@ function boardcast(){
 				for(let i of e.post){
 					msg.addField(i.title, i.url)
 				}
-				boardcastPool.forEach(channel => channel.send(embed));
+				broadcastPool.forEach(channel => channel.send(embed));
 				*/
 				let msg = 'New post!\n';
 				for(let i of e.post){
 					msg += `${i.title }\n\t${i.url}\n`;
-				}
-				boardcastPool.forEach(channel => channel.send(msg));
+				} 
+				broadcastPool.forEach(channel => channel.send(msg));
 				
 			 }
 		}).catch(console.error);
 }
 
-module.exports = boardcast;
+module.exports = broadcast;
