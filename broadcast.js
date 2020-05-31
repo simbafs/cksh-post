@@ -67,6 +67,9 @@ simply.cmd('cp', (msg, arg) => {
 				msg.channel.send('This channel isn\'t in the list');
 			}
 			break;
+		case 'check': 
+			broadcast();
+			break;
 		case 'help':
 		default:
 			msg.channel.send(helpMsg);
@@ -82,7 +85,7 @@ function broadcast(){
 			console.log('channel', broadcastPool.length);
 			console.log(broadcastPoolID);
 			console.groupEnd();
-			 if(e.status === 'new post'){
+			if(e.post.length > 0){
 				/*
 				let embed = new MessageEmbed()
 					.setColor([170, 87, 242])
@@ -101,7 +104,9 @@ function broadcast(){
 				} 
 				broadcastPool.forEach(channel => channel.send(msg));
 				
-			 }
+			}else{
+				console.log('no new post');
+			}
 		}).catch(console.error);
 }
 

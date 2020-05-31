@@ -48,7 +48,7 @@ const getPost = () => axios.get(url)
 		if(db.get('fingerprint') === fingerprint){
 			// console.log('no new post');	
 			return new Promise(res => res({
-				status: 'no new post',
+				post: []
 			}));
 		}
 
@@ -80,7 +80,6 @@ const getPost = () => axios.get(url)
 		db.set('posts', post);
 
 		return new Promise(res => res({
-			status: 'new post',
 			post: newPost
 		}));
 	})
