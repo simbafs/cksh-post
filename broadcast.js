@@ -40,6 +40,7 @@ simply.on('ready', () => {
 });
 
 simply.set('prefix', '!');
+simply.set('activity', `Stay at ${process.env.at}`);
 simply.cmd('cp', (msg, arg) => {
 	switch(arg[1]){
 		case 'ping':
